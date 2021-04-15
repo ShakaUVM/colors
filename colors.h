@@ -138,11 +138,22 @@ void set_raw_mode(bool flag) {
 		termios tio = old_tio;
 		tio.c_lflag &= ~(ICANON | ECHO); // Disable echo and canonical (cooked) mode
 		tcsetattr(STDIN_FILENO, TCSANOW, &tio);
+		std::cerr << "[?1049h" << std::endl;
 	} else if (!flag and raw_mode) { //Restore original settings
 		tcsetattr(STDIN_FILENO,TCSANOW,&old_tio);
 		raw_mode = false;
 	}
 	//else, do nothing since it's already set one way or the other
+}
+
+//TODO: Figure out a better way of doing smcup & rmcup
+//Switches between alternate buffers, like Vim
+//This lets you switch the whole contents of the screen
+void set_alternate_window(bool flag) {
+	if (flag) 
+		std::cerr << "[?1049h" << std::endl;
+	else
+		std::cerr << "[22;0;0t" << std::endl;
 }
 
 //Many terminals support the ability to send mouse events
@@ -231,6 +242,7 @@ int quick_read() {
 
 		//See if it contains the 4 byte escape sequence for a mouse event
 		while (input.size() > 4) {
+			auto [rows,cols] = get_terminal_size(); //Make sure we're returning an int in range
 			if (input[0] == '[' and
 					input[1] == '<' and
 					input[2] == '0' and
@@ -255,6 +267,8 @@ int quick_read() {
 						int temp = c - '0';
 						if (reading_col) temp_col = 10*temp_col + temp;
 						else temp_row = 10*temp_row + temp;
+						//Double clicks aren't handled, so just pretend nothing happened
+						if (temp_col > cols or temp_row > rows) return ERR;
 					}
 				}
 
