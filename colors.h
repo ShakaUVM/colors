@@ -46,19 +46,19 @@ const std::string BOLDWHITE   = "\033[1m\033[37m";      /* Bold White */
 //Sets the background color for all text printed from this point on
 //Values range from 0 to 255 in each color channel
 //Example: setbgcolor(255,0,255) will set the background color to purple
-void setbgcolor(uint8_t R, uint8_t G, uint8_t B) {
+inline void setbgcolor(uint8_t R, uint8_t G, uint8_t B) {
 	std::cerr << "\033[48;2;" << (int)R << ";" << (int)G << ";" << (int)B << "m";
 }
 
 //Sets the foreground color for all text printed from this point on
 //Example: setcolor(128,128,128) will set the foreground color to 50% grey
-void setcolor(uint8_t R, uint8_t G, uint8_t B) {
+inline void setcolor(uint8_t R, uint8_t G, uint8_t B) {
 	std::cerr << "\033[38;2;" << (int)R << ";" << (int)G << ";" << (int)B << "m";
 }
 
 //Sets the foreground and background colors back to the default
 //Example: resetcolor();
-void resetcolor() {
+inline void resetcolor() {
 	std::cerr << "\033[0m";
 }
 
@@ -66,7 +66,7 @@ void resetcolor() {
 
 //Returns the ROWS and COLS of the current terminal
 //Example: auto [rows,cols] = get_terminal_size() will make a variable named rows that has the number of rows of the current screen, and cols with the number of columns
-std::pair<int,int> get_terminal_size() { 
+inline std::pair<int,int> get_terminal_size() { 
     struct winsize w;
     ioctl(0, TIOCGWINSZ, &w);
     return {w.ws_row-1, w.ws_col}; //Subtract 1 to give room for the UNIX prompt at the bottom of the screen
@@ -74,35 +74,35 @@ std::pair<int,int> get_terminal_size() {
 
 //Moves the cursor to the indicated row and column
 //Example: movecursor(10,40) will move the cursor to the row 10 down from the top and 70 to the right of the left edge
-void movecursor(uint32_t row, uint32_t col) {
+inline void movecursor(uint32_t row, uint32_t col) {
 	std::cerr << "\033[" << row << ";" << col << "H";
 }
 
 //Clears the screen
 //Example: clearscreen();
-void clearscreen() {
+inline void clearscreen() {
 	std::cerr << "\033[2J";
 }
 
 //Allows you to turn the cursor on or off
 //Example: show_cursor(false) will turn off the cursor (the little green box)
-void show_cursor(bool flag) {
+inline void show_cursor(bool flag) {
 	if (flag) 
 		std::cerr << "\033[?25h";
 	else
 		std::cerr << "\033[?25l";
 }
-void set_cursor_mode(bool flag) { show_cursor(flag); } //Alias
+inline void set_cursor_mode(bool flag) { show_cursor(flag); } //Alias
 
-//Mouse support
-static bool mouse_mode = false; //We default to not reading mouse events
-void remind_about_callbacks(int row, int col);
+//Mouse support - there may be a bug with the first click
+inline static bool mouse_mode = false; //We default to not reading mouse events
+inline void remind_about_callbacks(int row, int col);
 //With mouse events on, if they don't set a handler for mousedown events we will remind them
-static std::function<void(int,int)> mousedown_callback = remind_about_callbacks;
-static std::function<void(int,int)> mouseup_callback = [](int,int){}; //Ignore mouseup events by default
+inline static std::function<void(int,int)> mousedown_callback = remind_about_callbacks;
+inline static std::function<void(int,int)> mouseup_callback = [](int,int){}; //Ignore mouseup events by default
 
 //The default function reminds users how to set up a callback then disables itself
-void remind_about_callbacks(int row, int col) {
+inline void remind_about_callbacks(int row, int col) {
 	std::cerr << "You enabled mouse events but you didn't call 'on_mousedown' to set up a callback, so enabling mouse events was pointless.\n";
 	std::cerr << "Write code like this: 'void mousedown(int row, int col) { std::cout << row << \",\" << col << std::endl; }\nand then in main: on_mousedown(mousedown);\nDitto for mouseup. Then whenever the user clicks, it will call these two functions." << std::endl;
 	std::cerr << "If you instead want to disable, for example, mouseup events, do this: on_mouseup([](int,int){});" << std::endl;
@@ -118,10 +118,10 @@ void remind_about_callbacks(int row, int col) {
 //  on_mousedown(your_function_name); 
 //Where your_function_name is something like this:
 //  void your_function_name(int row, int col) { cout << row << "," << col << endl; }
-void on_mousedown(std::function<void(int,int)> f) {
+inline void on_mousedown(std::function<void(int,int)> f) {
 	mousedown_callback = f;
 }
-void on_mouseup(std::function<void(int,int)> f) {
+inline void on_mouseup(std::function<void(int,int)> f) {
 	mouseup_callback = f;
 }
 
@@ -130,7 +130,7 @@ void on_mouseup(std::function<void(int,int)> f) {
 //Example: set_raw_mode(true) will turn on nonblocking I/O for cin
 //Example: set_raw_mode(false) will reset I/O to work like normal
 static bool raw_mode = false; //We default to canonical mode
-void set_raw_mode(bool flag) {
+inline void set_raw_mode(bool flag) {
 	static struct termios old_tio; //Save old settings
 	if (flag and !raw_mode) { //Save original terminal settings
 		tcgetattr(STDIN_FILENO,&old_tio);
@@ -149,7 +149,7 @@ void set_raw_mode(bool flag) {
 //TODO: Figure out a better way of doing smcup & rmcup
 //Switches between alternate buffers, like Vim
 //This lets you switch the whole contents of the screen
-void set_alternate_window(bool flag) {
+inline void set_alternate_window(bool flag) {
 	if (flag) 
 		std::cerr << "[?1049h" << std::endl;
 	else
@@ -158,7 +158,7 @@ void set_alternate_window(bool flag) {
 
 //Many terminals support the ability to send mouse events
 //Example: set_mouse_mode(true) will give us the ability to read clicks
-void set_mouse_mode(bool flag) {
+inline void set_mouse_mode(bool flag) {
 	if (flag) { //Enable mouse
 		//Why == true? It makes the assertion failed message understandable
 		assert(raw_mode == true); //Mouse can only be enabled in raw_mode
@@ -174,7 +174,7 @@ void set_mouse_mode(bool flag) {
 //Returns how many bytes are waiting in the input buffer
 //Precondition: Requires set_raw_mode(true) to work
 //Example: int bytes_available = kbhit() will return how many bytes are in the input queue to be read
-int kbhit() {
+inline int kbhit() {
 	assert(raw_mode == true); //This code only works in raw mode
 	int count = 0;
 	ioctl(STDIN_FILENO, FIONREAD, &count);
@@ -222,7 +222,7 @@ const int MOUSE_WHEEL_DOWN	= 658;
 //Lightweight Equivalent to NCURSES getch()
 //Precondition: Requires set_raw_mode(true) to work
 //Example: int ch = quick_read() will return ERR if no key has been hit, or 'A' if they hit A, or PAGE_DOWN if they hit page down, etc.
-int quick_read() {
+inline int quick_read() {
 	assert(raw_mode == true); //This code only works in raw mode 
 	int bytes_available = kbhit();
 	if (bytes_available) {
