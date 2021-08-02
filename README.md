@@ -69,3 +69,8 @@ If you set your font size small enough, you can actually render images inside of
 ![image](https://user-images.githubusercontent.com/8254997/123489896-d42f2600-d5c7-11eb-8a81-c0989abe0224.png)
 
 PuTTY will tend to lag or crash when rendering 4K images inside of it. I reported this as a bug to the developers but haven't heard back from them yet. 😝
+
+Oh, and then one other really useful function is the ability to get the size of the terminal. If you have C++17, you can even get both the columns and rows in one line like this:
+```C++
+    const auto [ROWS,COLS] = get_terminal_size();
+```
