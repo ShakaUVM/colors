@@ -102,7 +102,7 @@ inline static std::function<void(int,int)> mousedown_callback = remind_about_cal
 inline static std::function<void(int,int)> mouseup_callback = [](int,int){}; //Ignore mouseup events by default
 
 //The default function reminds users how to set up a callback then disables itself
-inline void remind_about_callbacks(int row, int col) {
+inline void remind_about_callbacks([[maybe_unused]] int row,[[maybe_unused]] int col) {
 	std::cerr << "You enabled mouse events but you didn't call 'on_mousedown' to set up a callback, so enabling mouse events was pointless.\n";
 	std::cerr << "Write code like this: 'void mousedown(int row, int col) { std::cout << row << \",\" << col << std::endl; }\nand then in main: on_mousedown(mousedown);\nDitto for mouseup. Then whenever the user clicks, it will call these two functions." << std::endl;
 	std::cerr << "If you instead want to disable, for example, mouseup events, do this: on_mouseup([](int,int){});" << std::endl;
