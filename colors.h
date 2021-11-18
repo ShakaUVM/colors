@@ -138,7 +138,7 @@ inline void set_raw_mode(bool flag) {
 		termios tio = old_tio;
 		tio.c_lflag &= ~(ICANON | ECHO); // Disable echo and canonical (cooked) mode
 		tcsetattr(STDIN_FILENO, TCSANOW, &tio);
-		std::cerr << "[?1049h" << std::endl;
+		//std::cerr << "[?1049h" << std::endl;
 	} else if (!flag and raw_mode) { //Restore original settings
 		tcsetattr(STDIN_FILENO,TCSANOW,&old_tio);
 		raw_mode = false;
@@ -150,10 +150,16 @@ inline void set_raw_mode(bool flag) {
 //Switches between alternate buffers, like Vim
 //This lets you switch the whole contents of the screen
 inline void set_alternate_window(bool flag) {
-	if (flag) 
-		std::cerr << "[?1049h" << std::endl;
-	else
-		std::cerr << "[22;0;0t" << std::endl;
+	if (flag) {
+		std::cerr << "[?1049h";
+		std::cerr.flush();
+		//std::cerr << "[?1049h" << std::endl;
+	}
+	else {
+		std::cerr << "[22;0;0t";
+		std::cerr.flush();
+		//std::cerr << "[22;0;0t" << std::endl;
+	}
 }
 
 //Many terminals support the ability to send mouse events
