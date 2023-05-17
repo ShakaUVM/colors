@@ -1,9 +1,10 @@
-#ifndef __COLORS_H__
-#define __COLORS_H__
+#ifndef COLORS_H
+#define COLORS_H
 //colors.h - A lightweight replacement for NCURSES that does 24 bit color, cursor movement, and nonblocking I/O
 //It uses standard ANSI escape codes to set the foreground and background text colors for a terminal
 //Prerequisite: Use with a modern terminal emulator, such as iterm2 for Mac or PuTTY for PC
 #include <cstdlib>
+#include <cstdint>
 #include <string>
 #include <iostream>
 #include <cstdio>
@@ -73,7 +74,7 @@ inline std::pair<int,int> get_terminal_size() {
 }
 
 //Moves the cursor to the indicated row and column
-//Example: movecursor(10,40) will move the cursor to the row 10 down from the top and 70 to the right of the left edge
+//Example: movecursor(10,40) will move the cursor to the row 10 down from the top and 40 to the right of the left edge
 inline void movecursor(uint32_t row, uint32_t col) {
 	std::cerr << "\033[" << row << ";" << col << "H";
 }
