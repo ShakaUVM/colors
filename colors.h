@@ -16,6 +16,7 @@
 #include <cassert>
 #include <functional>
 #include <queue>
+#include <cstdint>
 
 //Usage:
 //Echo RED as part of a cout to turn the following text red
